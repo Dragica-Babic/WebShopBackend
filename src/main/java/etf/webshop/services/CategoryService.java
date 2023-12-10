@@ -3,20 +3,19 @@ package etf.webshop.services;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import etf.webshop.exceptions.ResourceNotFoundException;
 import etf.webshop.model.dto.CategoryDTO;
 import etf.webshop.model.entities.Category;
 import etf.webshop.repositories.CategoryRepository;
 
+@AllArgsConstructor
 @Service
 public class CategoryService {
 
-	@Autowired
 	private CategoryRepository categoryRepository;
-	@Autowired
 	private ModelMapper modelMapper;
 	
 	public List<CategoryDTO> findAll(){

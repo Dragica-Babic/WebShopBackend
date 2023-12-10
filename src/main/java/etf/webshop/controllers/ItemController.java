@@ -1,46 +1,38 @@
 package etf.webshop.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import etf.webshop.exceptions.ResourceNotFoundException;
 import etf.webshop.model.dto.ItemDTO;
-import etf.webshop.model.enums.ImageType;
 import etf.webshop.model.requests.ItemRequest;
 import etf.webshop.services.ItemService;
 import etf.webshop.services.UtilService;
-import etf.webshop.specification.ItemSearchCriteria;
 
 import jakarta.validation.Valid;
 
 import java.util.List;
 
-@Validated
+@AllArgsConstructor
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/items")
 public class ItemController {
 
-	@Autowired
 	private ItemService itemService;
-	@Autowired
 	private UtilService utilService;
 	
-	@PostMapping("/all")
-	public ResponseEntity<Page<ItemDTO>> getAllItems(Pageable page, @RequestBody ItemSearchCriteria criteria){
-		Page<ItemDTO> items=itemService.getAllItems(page, criteria);
+	@GetMapping("/all")
+	public ResponseEntity<Page<ItemDTO>> getAllItems(@RequestParam(required = false) Integer categoryId,
+													 @RequestParam(required = false) String search,
+													 @RequestParam(required = false) String location,
+													 @RequestParam(required = false) String lowerPrice,
+													 @RequestParam(required = false) String upperPrice,
+													 Pageable page){
+
+		Page<ItemDTO> items=itemService.getAllItems(page, categoryId, search, location, lowerPrice, upperPrice);
 		return ResponseEntity.ok(items);
 	}
 
@@ -79,7 +71,6 @@ public class ItemController {
 	@PostMapping
 	public ResponseEntity<ItemDTO> addItem(@Valid @RequestBody ItemRequest item) throws ResourceNotFoundException{
 		ItemDTO newItem=itemService.addItem(item);
-		
 		return ResponseEntity.ok(newItem);
 	}
 	
@@ -89,18 +80,18 @@ public class ItemController {
 		return ResponseEntity.ok(updatedItem);
 	}
 	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteItem(@PathVariable int id) {
-		return ResponseEntity.ok(itemService.deleteItem(id));
+	@GetMapping("/delete/{id}")
+	public void deleteItem(@PathVariable int id) {
+		itemService.deleteItem(id);
 	}
 	
 	@PostMapping("/{id}/upload-image")
 	public void uploadImage(@RequestBody MultipartFile file, @PathVariable int id) {
-		utilService.uploadImage(file, id, ImageType.ITEM);
+		utilService.uploadImage(file, id);
 	}
 	
-	@PutMapping("/buy/{id}")
-	public ResponseEntity<?> buyItem(@PathVariable int id, @RequestBody Integer customerId) {
-		return ResponseEntity.ok(itemService.buyItem(id, customerId));
+	@PostMapping("/buy/{id}")
+	public Integer buyItem(@PathVariable int id, @RequestBody Integer customerId) {
+		return itemService.buyItem(id, customerId);
 	}
 }

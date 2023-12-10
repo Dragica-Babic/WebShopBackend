@@ -16,7 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 
 	Page<Item> findAll(@Nullable Specification<Item> spec, Pageable page);
 
-	List<Item> findAllByIsDeletedFalse();
+	List<Item> findAllByIsDeletedFalseAndIsActiveTrue();
 
 	Page<Item> findAllByUserIdAndIsDeletedFalseAndIsActiveTrue(int id, Pageable page);
 	

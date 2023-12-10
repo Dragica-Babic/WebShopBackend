@@ -1,11 +1,16 @@
 package etf.webshop.exceptions;
 
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 
+import java.io.Serial;
+
+@Data
 public class HttpException extends RuntimeException {
 	/**
 	 * 
 	 */
+	@Serial
 	private static final long serialVersionUID = 1L;
 	private HttpStatus status;
     private Object data;
@@ -23,22 +28,4 @@ public class HttpException extends RuntimeException {
         this.status = status;
         this.data = data;
     }
-
-	public HttpStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(HttpStatus status) {
-		this.status = status;
-	}
-
-	public Object getData() {
-		return data;
-	}
-
-	public void setData(Object data) {
-		this.data = data;
-	}
-    
-    
 }

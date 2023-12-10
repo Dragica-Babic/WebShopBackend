@@ -3,8 +3,8 @@ package etf.webshop.services;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import etf.webshop.exceptions.ResourceNotFoundException;
 import etf.webshop.model.dto.QuestionDTO;
@@ -12,13 +12,10 @@ import etf.webshop.model.entities.Question;
 import etf.webshop.model.requests.QuestionRequest;
 import etf.webshop.repositories.QuestionRepository;
 
+@AllArgsConstructor
 @Service
 public class QuestionService {
-	
-	@Autowired
 	private QuestionRepository questionRepository;
-	
-	@Autowired
 	private ModelMapper modelMapper;
 	
 	public List<QuestionDTO> getAllByItemId(int id){
@@ -32,8 +29,7 @@ public class QuestionService {
 	}
 	
 	public Question getById(int id) {
-		Question question=questionRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Pitanje nije pronadjeno"));
-		return question;
+        return questionRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Pitanje nije pronadjeno"));
 	}
 	
 	public QuestionDTO addAnswer(int id, QuestionRequest request) throws ResourceNotFoundException {

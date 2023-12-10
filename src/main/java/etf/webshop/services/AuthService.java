@@ -1,69 +1,59 @@
 package etf.webshop.services;
 
+import etf.webshop.model.entities.UserEntity;
+import etf.webshop.repositories.UserRepository;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import etf.webshop.model.dto.AccountDTO;
-import etf.webshop.model.dto.PinDTO;
 import etf.webshop.model.dto.UserDTO;
-import etf.webshop.model.requests.AccountRequest;
 import etf.webshop.model.requests.LoginRequest;
 import etf.webshop.model.requests.SignupRequest;
 import etf.webshop.model.requests.UserRequest;
 
 import jakarta.validation.Valid;
 
+@AllArgsConstructor
 @Service
 public class AuthService {
-	
-	@Autowired
-	private AccountService accountService;
-	@Autowired
-	private UserService userService;
-	@Autowired
+
+	private final UserRepository userRepository;
 	private ModelMapper modelMapper;
-	@Autowired
-	private PinService pinService;
-	@Autowired
-	private EmailService emailService;
-	
+	@Lazy
+	private final PasswordEncoder passwordEncoder;
+
 	public UserDTO signup(@Valid SignupRequest request) {
 		UserDTO userDTO=null;
-		if(!userService.existsByUsername(request.getUsername())) {
-		AccountRequest account=modelMapper.map(request, AccountRequest.class);
-		AccountDTO accountDTO=accountService.addAccount(account);
-		UserRequest user=modelMapper.map(request, UserRequest.class);
-		user.setAccountId(accountDTO.getId());
-		userDTO=userService.addUser(user);
-		if(userDTO != null) {
-			pinService.insertPin(userDTO.getId());
-			emailService.sendMail(userDTO.getEmail(), pinService.getByUserId(userDTO.getId()).getValue());
-		}
+		if(!existsByUsername(request.getUsername())) {
+			UserRequest user=modelMapper.map(request, UserRequest.class);
+			userDTO=addUser(user);
 		}
 		return userDTO;
-		
 	}
-	
+
 	public UserDTO login(LoginRequest request) {
-		if(userService.existsByUsernameAndPassword(request.getUsername(), request.getPassword())){
-			UserDTO user=userService.getByUsername(request.getUsername());
-			if(!user.isActivated()) {
-				pinService.updatePin(user.getId());
-				emailService.sendMail(user.getEmail(), pinService.getByUserId(user.getId()).getValue());
-			}
-			return user;
-		}
-		return null;
+		return getUserByUsername(request.getUsername());
 	}
-	
-	public boolean activate(int userId, String pin) {
-		boolean result=false;
-		PinDTO pinDTO=pinService.getByUserId(userId);
-		if(pin.equals(pinDTO.getValue())) {
-			result=true;
-			userService.activateUser(userId);
+
+	private boolean existsByUsername(String username){
+		return userRepository.existsByUsername(username);
+	}
+
+	private UserDTO addUser(UserRequest user) {
+		UserEntity userEntity= modelMapper.map(user, UserEntity.class);
+		userEntity.setActive(true);
+		userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
+		userEntity=userRepository.save(userEntity);
+		return modelMapper.map(userEntity, UserDTO.class);
+	}
+
+	private UserDTO getUserByUsername(String username){
+		UserEntity user=userRepository.findByUsername(username);
+		if(user==null){
+			throw new UsernameNotFoundException("Korisnik ne postoji!");
 		}
-		
-		return result;
+		return modelMapper.map(userRepository.findByUsername(username), UserDTO.class);
 	}
 }

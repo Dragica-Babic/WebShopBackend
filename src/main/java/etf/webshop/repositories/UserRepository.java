@@ -1,21 +1,13 @@
 package etf.webshop.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
-import etf.webshop.model.entities.User;
+import etf.webshop.model.entities.UserEntity;
 
 @Transactional
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 	
-	boolean existsByAccountUsernameAndAccountPassword(String username, String password);
+	UserEntity findByUsername(String username);
 	
-	User findByAccountUsername(String username);
-	
-	boolean existsByAccountUsername(String username);
-	
-	@Modifying
-	@Query("update User u set u.isActivated=true where u.id=:id")
-	void activateUser(int id);
+	boolean existsByUsername(String username);
 }

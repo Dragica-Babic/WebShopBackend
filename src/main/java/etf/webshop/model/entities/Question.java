@@ -8,7 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name="question")
 public class Question {
@@ -22,39 +24,8 @@ public class Question {
     private String answer;
     @ManyToOne
     @JoinColumn(name="user_id", referencedColumnName = "id")
-    private User user;
+    private UserEntity user;
     @ManyToOne
     @JoinColumn(name="item_id", referencedColumnName = "id")
     private Item item;
-
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
-    public String getQuestion() {
-        return question;
-    }
-    public void setQuestion(String question) {
-        this.question = question;
-    }
-    public String getAnswer() {
-        return answer;
-    }
-    public void setAnswer(String answer) {
-        this.answer = answer;
-    }
-    public User getUser() {
-        return user;
-    }
-    public void setUser(User user) {
-        this.user = user;
-    }
-    public Item getItem() {
-        return item;
-    }
-    public void setItem(Item item) {
-        this.item = item;
-    }
 }

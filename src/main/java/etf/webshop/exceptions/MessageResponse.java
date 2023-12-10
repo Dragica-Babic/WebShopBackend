@@ -1,7 +1,10 @@
 package etf.webshop.exceptions;
 
+import lombok.Data;
+
 import java.util.Date;
 
+@Data
 public class MessageResponse {
 	private Date timestamp;
 	private String error;
@@ -11,19 +14,4 @@ public class MessageResponse {
 	    this.error = errorMessage;
 	  }
 
-	public String getError() {
-		return error;
-	}
-
-	public void setError(String errorMessage) {
-		this.error = errorMessage;
-	}
-
-	public Date getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
-	}
 }

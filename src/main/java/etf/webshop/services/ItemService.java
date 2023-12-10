@@ -1,7 +1,7 @@
 package etf.webshop.services;
 
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,22 +19,26 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Transactional
 @Service
 public class ItemService {
 
-	@Autowired
 	private ItemRepository itemRepository;
-	@Autowired
 	private ModelMapper modelMapper;
 	
-	public Page<ItemDTO> getAllItems(Pageable page, ItemSearchCriteria c){
-		Specification<Item> specification=ItemSpecification.createItemSpecification(c);
+	public Page<ItemDTO> getAllItems(Pageable page, Integer categoryId, String search, String location, String lowerPrice, String upperPrice){
+		Double lowerPriceValue=null;
+		Double upperPriceValue=null;
+		if(!lowerPrice.isEmpty()){lowerPriceValue=Double.parseDouble((lowerPrice));}
+		if(!upperPrice.isEmpty()){upperPriceValue=Double.parseDouble((upperPrice));}
+		ItemSearchCriteria criteria=new ItemSearchCriteria(categoryId, search, location, lowerPriceValue, upperPriceValue);
+		Specification<Item> specification=ItemSpecification.createItemSpecification(criteria);
 		return itemRepository.findAll(specification,page).map(p->modelMapper.map(p, ItemDTO.class));
 	}
 
 	public List<ItemDTO> getAll(){
-		return  itemRepository.findAllByIsDeletedFalse().stream().map(p->modelMapper.map(p, ItemDTO.class)).collect(Collectors.toList());
+		return  itemRepository.findAllByIsDeletedFalseAndIsActiveTrue().stream().map(p->modelMapper.map(p, ItemDTO.class)).collect(Collectors.toList());
 	}
 	
 	//aktivne
@@ -67,6 +71,7 @@ public class ItemService {
 	public ItemDTO updateItem(int id, ItemRequest itemReq) {
 		Item item=modelMapper.map(itemReq, Item.class);
 		item.setId(id);
+		item.setActive(true);
 		item=itemRepository.saveAndFlush(item);
 		return getById(item.getId());
 	}

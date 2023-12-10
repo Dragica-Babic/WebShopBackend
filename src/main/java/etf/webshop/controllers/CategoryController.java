@@ -2,9 +2,8 @@ package etf.webshop.controllers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,12 +12,11 @@ import etf.webshop.exceptions.ResourceNotFoundException;
 import etf.webshop.model.dto.CategoryDTO;
 import etf.webshop.services.CategoryService;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@AllArgsConstructor
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
 
-	@Autowired
 	private CategoryService categoryService;
 	
 	@GetMapping

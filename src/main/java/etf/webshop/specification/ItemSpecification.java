@@ -25,12 +25,11 @@ public class ItemSpecification {
 			}
 			if(criteria.getLocation()!=null)
 				predicates.add(cb.like(cb.lower(root.get("location")),"%"+ criteria.getLocation().toLowerCase()+"%"));
-			if(criteria.getUsed()!=null)
-				predicates.add(cb.equal(root.get("isUsed"), criteria.getUsed()));
-			if(criteria.getLowerPriceLimit()!=null) {
+			System.out.println(criteria.getLowerPriceLimit());
+			if(null!=criteria.getLowerPriceLimit()) {
 				predicates.add(cb.greaterThan(root.get("price"), criteria.getLowerPriceLimit()));
 			}
-			if(criteria.getUpperPriceLimit()!=null)
+			if(null!=criteria.getUpperPriceLimit())
 				predicates.add(cb.lessThan(root.get("price"), criteria.getUpperPriceLimit()));
 			
 			return cb.and(predicates.toArray(new Predicate[0]));
